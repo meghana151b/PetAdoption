@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pet Adoption</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f2f2f2;
+    }
+    h1, h2 {
+        text-align: center;
+    }
+    #petForm {
+        max-width: 600px;
+        margin: 20px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+    #petForm input, #petForm button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    #pets {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+    .pet-card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .pet-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    .pet-card button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .pet-card button:hover {
+        background-color: #45a049;
+    }
+</style>
+</head>
+<body>
+
+<h1>🐾 Pet Adoption Center 🐾</h1>
+
+<h2>Add New Pet</h2>
+<form id="petForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="type" placeholder="Type(Dog,Cat etc)" required>
+    <input type="text" id="breed" placeholder="Breed" required>
+    <input type="number" id="age" placeholder="Age(in months)" required>
+    <input type="text" id="description" placeholder="Description" required>
+    <input type="text" id="imageUrl" placeholder="Image URL" required>
+    <button type="submit">Add Pet</button>
+</form>
+
+<h2>Available Pets</h2>
+<div id="pets"></div>
+
+<script>
+document.getElementById('petForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const pet = {
+        name: document.getElementById('name').value,
+        type: document.getElementById('type').value,
+        breed: document.getElementById('breed').value,
+        age: parseInt(document.getElementById('age').value),
+        description: document.getElementById('description').value,
+        imageUrl: document.getElementById('imageUrl').value
+    };
+
+    fetch('http://localhost:8088/api/pets', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(pet)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Pet added successfully!');
+        location.reload();
+    });
+});
+
+fetch('http://localhost:8088/api/pets')
+.then(response => response.json())
+.then(data => {
+    let petsDiv = document.getElementById('pets');
+    data.forEach(pet => {
+        if (!pet.adopted) {
+            petsDiv.innerHTML += `
+            <div class="pet-card">
+                <img src="${pet.imageUrl}" alt="${pet.name}">
+                <h3>${pet.name} (${pet.type})</h3>
+                <p><strong>Breed:</strong> ${pet.breed}</p>
+                <p><strong>Age:</strong> ${pet.age} months</p>
+                <p>${pet.description}</p>
+                <button onclick="adoptPet(${pet.id})">Adopt</button>
+            </div>
+            `;
+        }
+    });
+});
+
+function adoptPet(petId) {
+    let username = prompt("Enter your name:");
+    let contactInfo = prompt("Enter your contact info:");
+    fetch(`http://localhost:8088/api/adoptions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userName: username, contactInfo: contactInfo, petId: petId })
+    }).then(() => {
+        alert("Adoption request submitted!");
+        location.reload();
+    });
+}
+</script>
+
+</body>
+</html>
