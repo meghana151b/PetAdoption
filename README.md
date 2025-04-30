@@ -1,6 +1,6 @@
 #  Pet Adoption System
 
-A simple full-stack web application built using **Spring Boot**, **MySQL**, and **HTML+JavaScript**, where users can view pets and submit adoption requests.
+A simple full-stack web application built using **Spring Boot**, **MySQL**, and **HTML+JavaScript**, where users can view pets and submit adoption requests.Those adoption requests are approved and adoptio takes place .
 
 
 
